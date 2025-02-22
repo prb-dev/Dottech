@@ -29,10 +29,12 @@ export const signup = async (req, res, next) => {
 
     const user = new User({ ...rest, password: hashedPassword });
 
-    const marks = new Marks({ student: user._id, subjects });
-
     await user.save();
-    await marks.save();
+
+    if (rest.role === "student") {
+      const marks = new Marks({ student: user._id, subjects });
+      await marks.save();
+    }
 
     await sendEmail(
       rest.email,

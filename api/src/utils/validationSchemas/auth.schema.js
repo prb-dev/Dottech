@@ -5,6 +5,7 @@ export const signupSchema = Joi.object({
   name: Joi.string().trim().min(3).required(),
   password: Joi.string().trim().min(6).required(),
   age: Joi.number().integer().min(18).required(),
+  role: Joi.string().valid("student", "teacher").default("student"),
   image: Joi.string()
     .uri()
     .default(
