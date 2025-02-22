@@ -5,8 +5,20 @@ import { User } from "../models/user.model.js";
 import { customError } from "../utils/error.util.js";
 import jwt from "jsonwebtoken";
 import { sendEmail } from "../utils/emailer.util.js";
+import { Marks } from "../models/mark.model.js";
 
 export const signup = async (req, res, next) => {
+  const subjects = [
+    { name: "Sinhala" },
+    { name: "Maths" },
+    { name: "Science" },
+    { name: "History" },
+    { name: "Geography" },
+    { name: "IT" },
+    { name: "Religion" },
+    { name: "English" },
+    { name: "Commerce" },
+  ];
   const { error, value } = validateSignup(req.body);
 
   if (error) return next(error);
@@ -16,7 +28,11 @@ export const signup = async (req, res, next) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const user = new User({ ...rest, password: hashedPassword });
+
+    const marks = new Marks({ student: user._id, subjects });
+
     await user.save();
+    await marks.save();
 
     await sendEmail(
       rest.email,
