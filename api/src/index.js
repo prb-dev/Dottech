@@ -3,6 +3,7 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import dotenv from "dotenv";
 import authRouter from "./routes/auth.route.js";
+import userRouter from "./routes/user.route.js";
 import { errorMiddleware } from "./middlewares/error.middleware.js";
 import { logger } from "./utils/logger.util.js";
 import { connectDB } from "./config/db.config.js";
@@ -22,6 +23,7 @@ app.use(
 );
 
 app.use("/auth", authRouter);
+app.use("/user", userRouter);
 
 app.use(errorMiddleware);
 
