@@ -8,5 +8,6 @@ const router = express.Router();
 
 router.put("/:id", verifyToken, verifyUser, updateUser);
 router.get("/:id/marks", verifyToken, verifyUser, getMarks);
+router.patch("/:id/marks/:mid", verifyToken, verifyUser, updateMarks);
 
 export default router;

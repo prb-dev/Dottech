@@ -1,6 +1,7 @@
 import { signSchema, signupSchema } from "./validationSchemas/auth.schema.js";
 import {
   getMarksSchema,
+  updateMarksSchema,
 } from "./validationSchemas/marks.schema.js";
 import { updateUserSchema } from "./validationSchemas/user.schema.js";
 
@@ -14,3 +15,4 @@ export const validateSignin = validate(signSchema);
 export const validateUpdateUser = validate(updateUserSchema);
 
 export const validateGetMarks = validate(getMarksSchema);
+export const validateUpdateMarks = validate(updateMarksSchema);
