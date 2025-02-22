@@ -14,3 +14,8 @@ export const signupSchema = Joi.object({
         )}&size=250`
     ),
 });
+
+export const signSchema = Joi.object({
+  email: Joi.string().trim().email().required(),
+  password: Joi.string().trim().min(6).required(),
+});

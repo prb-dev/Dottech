@@ -1,8 +1,9 @@
 import bcrypt from "bcryptjs";
-import { validateSignup } from "../utils/validator.util.js";
+import { validateSignin, validateSignup } from "../utils/validator.util.js";
 import { logger } from "../utils/logger.util.js";
 import { User } from "../models/user.model.js";
 import { customError } from "../utils/error.util.js";
+import jwt from "jsonwebtoken";
 
 export const signup = async (req, res, next) => {
   const { error, value } = validateSignup(req.body);
@@ -29,6 +30,52 @@ export const signup = async (req, res, next) => {
     }
 
     logger.error("Couldn't register user: ", error);
+    return next(error);
+  }
+};
+
+export const signin = async (req, res, next) => {
+  const { error, value } = validateSignin(req.body);
+
+  if (error) return next(error);
+
+  const { email, password } = value;
+
+  const throwError = (message) => {
+    const error = customError(400, "Invalid credentials");
+    logger.error(message, error);
+    return next(error);
+  };
+  try {
+    const user = await User.findOne({ email });
+
+    if (!user) return throwError(`User with email ${email} not found: `);
+
+    const valid = await bcrypt.compare(password, user.password);
+
+    if (!valid)
+      return throwError(`Invalid password for user with email ${email}: `);
+
+    const token = jwt.sign(
+      { id: user._id, role: user.role },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "24h",
+      }
+    );
+
+    const { password: pass, ...rest } = user._doc;
+
+    logger.info(`User with email ${email} signed in successfully.`);
+    res
+      .cookie("token", token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        maxAge: 24 * 60 * 60 * 1000,
+      })
+      .json({ message: "User signed in successfully", user: rest });
+  } catch (error) {
+    logger.error(`Signin error for email ${email}: `, error);
     return next(error);
   }
 };
