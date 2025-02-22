@@ -4,6 +4,7 @@ import { logger } from "../utils/logger.util.js";
 import { User } from "../models/user.model.js";
 import { customError } from "../utils/error.util.js";
 import jwt from "jsonwebtoken";
+import { sendEmail } from "../utils/emailer.util.js";
 
 export const signup = async (req, res, next) => {
   const { error, value } = validateSignup(req.body);
@@ -16,6 +17,12 @@ export const signup = async (req, res, next) => {
 
     const user = new User({ ...rest, password: hashedPassword });
     await user.save();
+
+    await sendEmail(
+      rest.email,
+      "Welcome to our platform",
+      `<h1>Welcome ${rest.name}!</h1><p>You have successfully registered to our platform.</p>`
+    );
 
     logger.info(
       `User with email ${rest.email} and id ${user._id} registered successfully.`,
