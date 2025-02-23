@@ -78,6 +78,7 @@ const Profile = () => {
                 </FormItem>
               )}
             />
+
             <FormField
               control={form.control}
               name="name"
