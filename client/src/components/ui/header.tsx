@@ -41,7 +41,9 @@ const Header = () => {
                 <Link href="/profile" legacyBehavior passHref>
                   <DropdownMenuItem>Profile</DropdownMenuItem>
                 </Link>
-                <DropdownMenuItem>Signin</DropdownMenuItem>
+                <Link href="/auth/signin" legacyBehavior passHref>
+                  <DropdownMenuItem>Signin</DropdownMenuItem>
+                </Link>
               </DropdownMenuContent>
             </DropdownMenu>
           </NavigationMenuItem>
