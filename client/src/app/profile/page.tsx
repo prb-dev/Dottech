@@ -1,5 +1,4 @@
 "use client";
-
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -47,9 +46,9 @@ const Profile = () => {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  const onSubmit = (values: z.infer<typeof formSchema>) => {
     console.log(values);
-  }
+  };
 
   return (
     <div className="flex flex-col items-center p-5">
@@ -69,6 +68,7 @@ const Profile = () => {
                   <FormControl>
                     <Input
                       placeholder="shadcn"
+                      type="email"
                       {...field}
                       value={field.value ?? ""}
                     />
@@ -78,6 +78,7 @@ const Profile = () => {
                 </FormItem>
               )}
             />
+
             <FormField
               control={form.control}
               name="name"
