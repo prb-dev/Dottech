@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { useUserStore } from "@/_zustand/stores/userStore";
 
 const formSchema = z.object({
   email: z
@@ -37,6 +38,9 @@ const formSchema = z.object({
 });
 
 const Profile = () => {
+  const email = useUserStore((state) => state.email);
+  const name = useUserStore((state) => state.name);
+  const age = useUserStore((state) => state.age);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -67,7 +71,7 @@ const Profile = () => {
                   <FormLabel>Email</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="shadcn"
+                      placeholder={email || ""}
                       type="email"
                       {...field}
                       value={field.value ?? ""}
@@ -87,7 +91,7 @@ const Profile = () => {
                   <FormLabel>Name</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="shadcn"
+                      placeholder={name || ""}
                       {...field}
                       value={field.value ?? ""}
                     />
@@ -108,6 +112,7 @@ const Profile = () => {
                   <FormControl>
                     <Input
                       type="number"
+                      placeholder={age ? `${age}` : undefined}
                       {...field}
                       value={field.value ?? ""}
                       onChange={(e) =>
