@@ -40,9 +40,10 @@ export const updateMarks = async (req, res, next) => {
 
   const { mid, marks } = value;
   try {
-    const marksDoc = await Marks.findOne({ _id: mid, student: id }).select(
-      "-__v"
-    );
+    const marksDoc = await Marks.findOne({
+      "subjects._id": mid,
+      student: id,
+    }).select("-__v");
 
     if (!marksDoc) {
       const error = customError(404, "Marks not found");
