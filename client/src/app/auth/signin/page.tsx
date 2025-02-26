@@ -20,6 +20,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { useUserStore } from "@/_zustand/stores/userStore";
 
 const formSchema = z.object({
   email: z.string().email({
@@ -31,6 +32,8 @@ const formSchema = z.object({
 });
 
 const Signin = () => {
+  const signIn = useUserStore((state) => state.signIn);
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -39,8 +42,8 @@ const Signin = () => {
     },
   });
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
-    console.log(values);
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    await signIn(values.email, values.password);
   };
 
   return (

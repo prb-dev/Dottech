@@ -16,9 +16,12 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useUserStore } from "@/_zustand/stores/userStore";
 
 const Header = () => {
-  return (
+  const signedIn = useUserStore((state) => state.signedIn);
+  const image = useUserStore((state) => state.image);
+  return signedIn ? (
     <div className="flex justify-end p-5">
       <NavigationMenu>
         <NavigationMenuList className="space-x-5">
@@ -33,7 +36,7 @@ const Header = () => {
             <DropdownMenu>
               <DropdownMenuTrigger>
                 <Avatar className="cursor-pointer">
-                  <AvatarImage src="https://github.com/shadcn.png" />
+                  <AvatarImage src={image ?? undefined} />
                   <AvatarFallback>CN</AvatarFallback>
                 </Avatar>
               </DropdownMenuTrigger>
@@ -41,15 +44,15 @@ const Header = () => {
                 <Link href="/profile" legacyBehavior passHref>
                   <DropdownMenuItem>Profile</DropdownMenuItem>
                 </Link>
-                <Link href="/auth/signin" legacyBehavior passHref>
-                  <DropdownMenuItem>Signin</DropdownMenuItem>
-                </Link>
+                <DropdownMenuItem>Signout</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </NavigationMenuItem>
         </NavigationMenuList>
       </NavigationMenu>
     </div>
+  ) : (
+    <></>
   );
 };
 
