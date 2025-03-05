@@ -3,6 +3,7 @@ import * as React from "react";
 import { Subject, columns } from "./columns";
 import { DataTable } from "./data-table";
 import { useUserStore } from "@/_zustand/stores/userStore";
+import { toast } from "sonner";
 
 const Marks = () => {
   const id = useUserStore((state) => state.id);
@@ -23,6 +24,11 @@ const Marks = () => {
 
         const data = await response.json();
 
+        if (response.status !== 200) {
+          toast.error("Couldn't retrieve marks");
+          return;
+        }
+
         const subjects: Subject[] = data.marks.subjects.map(
           (subject: { _id: string; name: string; marks: number }) => ({
             id: subject._id,
@@ -32,7 +38,9 @@ const Marks = () => {
         );
 
         setSubjects(subjects);
-      } catch (error) {}
+      } catch (error) {
+        console.log(error);
+      }
     };
 
     getData(id);
