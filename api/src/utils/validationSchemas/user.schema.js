@@ -18,3 +18,12 @@ export const updateUserSchema = Joi.object({
   age: Joi.number().integer().min(18),
   image: Joi.string().uri(),
 });
+
+export const deleteStudentSchema = Joi.object({
+  id: Joi.string()
+    .regex(/^[0-9a-fA-F]{24}$/)
+    .messages({
+      "string.pattern.base": "Student id must be a valid ObjectId",
+    })
+    .required(),
+});
