@@ -98,6 +98,7 @@ export const signin = async (req, res, next) => {
         secure: process.env.NODE_ENV === "production",
         maxAge: 24 * 60 * 60 * 1000,
       })
+      .status(200)
       .json({ message: "User signed in successfully", user: rest });
   } catch (error) {
     logger.error(`Signin error for email ${email}: `, error);
