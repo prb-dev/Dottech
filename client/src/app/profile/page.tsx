@@ -13,6 +13,9 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { useUserStore } from "@/_zustand/stores/userStore";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { CldUploadWidget, CloudinaryUploadWidgetInfo } from "next-cloudinary";
 
 const formSchema = z.object({
   email: z
@@ -37,6 +40,11 @@ const formSchema = z.object({
 });
 
 const Profile = () => {
+  const updateUser = useUserStore((state) => state.updateUser);
+  const email = useUserStore((state) => state.email);
+  const name = useUserStore((state) => state.name);
+  const age = useUserStore((state) => state.age);
+  const image = useUserStore((state) => state.image);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -46,8 +54,26 @@ const Profile = () => {
     },
   });
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
-    console.log(values);
+  const updateImage = async (url: string) => {
+    try {
+      await updateUser(useUserStore.getState().id ?? "", { image: url });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    try {
+      const { email, name, age } = values;
+
+      if (!email && !name && !age) return;
+
+      await updateUser(useUserStore.getState().id ?? "", values);
+
+      form.reset();
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -57,6 +83,22 @@ const Profile = () => {
           Your Details
         </h3>
 
+        <div className="flex items-center gap-5">
+          <Avatar className="w-40 h-40">
+            <AvatarImage src={image ?? undefined} />
+            <AvatarFallback>CN</AvatarFallback>
+          </Avatar>
+          <CldUploadWidget
+            uploadPreset="ml_default"
+            onSuccess={({ event, info }) => {
+              if (event === "success") {
+                updateImage((info as CloudinaryUploadWidgetInfo)?.url);
+              }
+            }}
+          >
+            {({ open }) => <Button onClick={() => open()}>Upload image</Button>}
+          </CldUploadWidget>
+        </div>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
             <FormField
@@ -67,7 +109,7 @@ const Profile = () => {
                   <FormLabel>Email</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="shadcn"
+                      placeholder={email || ""}
                       type="email"
                       {...field}
                       value={field.value ?? ""}
@@ -87,7 +129,7 @@ const Profile = () => {
                   <FormLabel>Name</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="shadcn"
+                      placeholder={name || ""}
                       {...field}
                       value={field.value ?? ""}
                     />
@@ -108,6 +150,7 @@ const Profile = () => {
                   <FormControl>
                     <Input
                       type="number"
+                      placeholder={age ? `${age}` : undefined}
                       {...field}
                       value={field.value ?? ""}
                       onChange={(e) =>
