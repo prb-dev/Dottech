@@ -11,7 +11,24 @@ type userStore = {
   age: number | null;
   role: string | null;
   image: string | null;
-  signIn: (email: string, password: string) => Promise<void>;
+  signUp: (
+    email: string,
+    password: string,
+    name: string,
+    age: number,
+    redirect: () => void
+  ) => Promise<void>;
+  signIn: (email: string, password: string, redirect: () => void) => void;
+  signOut: () => void;
+  updateUser: (
+    id: string,
+    values: {
+      email?: string;
+      name?: string;
+      age?: number;
+      image?: string;
+    }
+  ) => Promise<void>;
 };
 
 export const useUserStore = create<userStore>()(
@@ -24,7 +41,8 @@ export const useUserStore = create<userStore>()(
       age: null,
       role: null,
       image: null,
-      signIn: async (email, password) => {
+      signUp: async (email, password, name, age, redirect) => {},
+      signIn: async (email, password, redirect) => {
         try {
           const response = await fetch("http://localhost:3000/auth/signin", {
             method: "POST",
@@ -64,6 +82,41 @@ export const useUserStore = create<userStore>()(
             role: data.user.role,
             image: data.user.image,
           });
+
+          redirect();
+        } catch (error) {
+          console.log(error);
+        }
+      },
+      signOut: () => {},
+      updateUser: async (id, values) => {
+        try {
+          const response = await fetch(`http://localhost:3000/users/${id}`, {
+            method: "PUT",
+            headers: {
+              "Content-type": "application/json",
+            },
+            credentials: "include",
+            body: JSON.stringify({
+              ...values,
+            }),
+          });
+
+          const data = await response.json();
+
+          if (response.status !== 200) {
+            toast.error(data.message);
+            return;
+          }
+
+          set({
+            email: data.user.email,
+            name: data.user.name,
+            age: data.user.age,
+            image: data.user.image,
+          });
+
+          toast.success("User updated successfully");
         } catch (error) {
           console.log(error);
         }
