@@ -57,6 +57,9 @@ export type Student = {
 };
 
 const formSchema = z.object({
+  name: z.string().min(3, {
+    message: "Name must be at least 3 characters long.",
+  }),
   age: z
     .number()
     .int()
@@ -146,6 +149,10 @@ export const getColumns = (
       cell: ({ row }) => {
         const form = useForm<z.infer<typeof formSchema>>({
           resolver: zodResolver(formSchema),
+          defaultValues: {
+            name: row.original.name,
+            age: row.original.age,
+          },
         });
         const student = row.original;
         const deleteStudent = async (id: string) => {
@@ -176,7 +183,7 @@ export const getColumns = (
                 "Content-type": "application/json",
               },
               credentials: "include",
-              body: JSON.stringify({}),
+              body: JSON.stringify(values),
             }
           );
 
@@ -193,99 +200,118 @@ export const getColumns = (
           }
 
           toast.success(data.message);
+          await getData();
         };
 
         return (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-8 w-8 p-0">
-                <span className="sr-only">Open menu</span>
-                <MoreHorizontal />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              <DropdownMenuItem
-                onClick={() => navigator.clipboard.writeText(student._id)}
-              >
-                Copy student ID
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem aria-hidden={false}>
-                <Dialog>
+          <Dialog>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="h-8 w-8 p-0">
+                  <span className="sr-only">Open menu</span>
+                  <MoreHorizontal />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                <DropdownMenuItem
+                  onClick={() => navigator.clipboard.writeText(student._id)}
+                >
+                  Copy student ID
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem aria-hidden={false}>
                   <DialogTrigger asChild>
                     <div onClick={(e) => e.stopPropagation()}>Edit</div>
                   </DialogTrigger>
-                  <DialogContent onClick={(e) => e.stopPropagation()}>
-                    <DialogHeader>
-                      <DialogTitle>Edit student</DialogTitle>
-                      <DialogDescription></DialogDescription>
-                    </DialogHeader>
-                    <Form {...form}>
-                      <form
-                        onSubmit={form.handleSubmit(updateStudent)}
-                        className="flex py-5 gap-5"
-                      >
-                        <FormField
-                          control={form.control}
-                          name="age"
-                          render={({ field }) => (
-                            <FormItem className="w-full">
-                              <FormControl>
-                                <Input
-                                  type="number"
-                                  placeholder={student.age.toString()}
-                                  {...field}
-                                  value={field.value ?? ""}
-                                  onChange={(e) =>
-                                    field.onChange(
-                                      e.target.value
-                                        ? parseInt(e.target.value)
-                                        : undefined
-                                    )
-                                  }
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
+                </DropdownMenuItem>
 
-                        <Button type="submit">Done</Button>
-                      </form>
-                    </Form>
-                  </DialogContent>
-                </Dialog>
-              </DropdownMenuItem>
+                <DropdownMenuItem aria-hidden={false}>
+                  <AlertDialog>
+                    <AlertDialogTrigger onClick={(e) => e.stopPropagation()}>
+                      Delete
+                    </AlertDialogTrigger>
+                    <AlertDialogContent onClick={(e) => e.stopPropagation()}>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>
+                          Are you absolutely sure?
+                        </AlertDialogTitle>
+                        <AlertDialogDescription>
+                          This action cannot be undone. This will permanently
+                          delete the student.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                          onClick={() => deleteStudent(student._id)}
+                        >
+                          Delete
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
 
-              <DropdownMenuItem aria-hidden={false}>
-                <AlertDialog>
-                  <AlertDialogTrigger onClick={(e) => e.stopPropagation()}>
-                    Delete
-                  </AlertDialogTrigger>
-                  <AlertDialogContent onClick={(e) => e.stopPropagation()}>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>
-                        Are you absolutely sure?
-                      </AlertDialogTitle>
-                      <AlertDialogDescription>
-                        This action cannot be undone. This will permanently
-                        delete the student.
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>Cancel</AlertDialogCancel>
-                      <AlertDialogAction
-                        onClick={() => deleteStudent(student._id)}
-                      >
-                        Delete
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+            <DialogContent onClick={(e) => e.stopPropagation()}>
+              <DialogHeader>
+                <DialogTitle>Edit student</DialogTitle>
+                <DialogDescription></DialogDescription>
+              </DialogHeader>
+              <Form {...form}>
+                <form
+                  onSubmit={form.handleSubmit(updateStudent)}
+                  className="flex flex-col py-5 gap-5"
+                >
+                  <FormField
+                    control={form.control}
+                    name="name"
+                    render={({ field }) => (
+                      <FormItem className="w-full">
+                        <FormControl>
+                          <Input
+                            placeholder={student.name}
+                            {...field}
+                            value={field.value ?? ""}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="age"
+                    render={({ field }) => (
+                      <FormItem className="w-full">
+                        <FormControl>
+                          <Input
+                            type="number"
+                            placeholder={student.age.toString()}
+                            {...field}
+                            value={field.value ?? ""}
+                            onChange={(e) =>
+                              field.onChange(
+                                e.target.value
+                                  ? parseInt(e.target.value)
+                                  : undefined
+                              )
+                            }
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <Button type="submit">Done</Button>
+                </form>
+              </Form>
+            </DialogContent>
+          </Dialog>
         );
       },
     },
