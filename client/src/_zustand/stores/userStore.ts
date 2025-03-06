@@ -7,7 +7,8 @@ type userStore = {
   signedIn: boolean | null;
   id: string | null;
   email: string | null;
-  name: string | null;
+  firstName: string | null;
+  lastName: string | null;
   age: number | null;
   role: string | null;
   image: string | null;
@@ -24,7 +25,8 @@ type userStore = {
     id: string,
     values: {
       email?: string;
-      name?: string;
+      firstName?: string;
+      lastName?: string;
       age?: number;
       image?: string;
     }
@@ -37,7 +39,8 @@ export const useUserStore = create<userStore>()(
       signedIn: null,
       id: null,
       email: null,
-      name: null,
+      firstName: null,
+      lastName: null,
       age: null,
       role: null,
       image: null,
@@ -77,7 +80,8 @@ export const useUserStore = create<userStore>()(
             signedIn: true,
             id: data.user._id,
             email: data.user.email,
-            name: data.user.name,
+            firstName: data.user.firstName,
+            lastName: data.user.lastName,
             age: data.user.age,
             role: data.user.role,
             image: data.user.image,
@@ -111,7 +115,8 @@ export const useUserStore = create<userStore>()(
 
           set({
             email: data.user.email,
-            name: data.user.name,
+            firstName: data.user.firstName,
+            lastName: data.user.lastName,
             age: data.user.age,
             image: data.user.image,
           });

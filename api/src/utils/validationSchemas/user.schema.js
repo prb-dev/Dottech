@@ -8,7 +8,8 @@ export const updateUserSchema = Joi.object({
     })
     .required(),
   email: Joi.string().email(),
-  name: Joi.string().trim().min(3),
+  firstName: Joi.string().trim().min(3),
+  lastName: Joi.string().trim().min(3),
   oldPassword: Joi.when("password", {
     is: Joi.exist(),
     then: Joi.string().trim().min(6).required(),
