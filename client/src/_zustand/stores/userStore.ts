@@ -14,11 +14,16 @@ type userStore = {
   signUp: (
     email: string,
     password: string,
-    name: string,
+    firstName: string,
+    lastName: string,
     age: number,
     redirect: () => void
   ) => Promise<void>;
-  signIn: (email: string, password: string, redirect: () => void) => void;
+  signIn: (
+    email: string,
+    password: string,
+    redirect: () => void
+  ) => Promise<void>;
   signOut: () => void;
   updateUser: (
     id: string,
@@ -41,7 +46,36 @@ export const useUserStore = create<userStore>()(
       age: null,
       role: null,
       image: null,
-      signUp: async (email, password, name, age, redirect) => {},
+      signUp: async (email, password, firstName, lastName, age, redirect) => {
+        try {
+          const response = await fetch("http://localhost:3000/auth/signup", {
+            method: "POST",
+            headers: {
+              "Content-type": "application/json",
+            },
+            credentials: "include",
+            body: JSON.stringify({
+              email,
+              password,
+              firstName,
+              lastName,
+              age,
+            }),
+          });
+
+          const data = await response.json();
+
+          if (response.status !== 201) {
+            toast.error("Couldn't create account");
+            return;
+          }
+
+          toast.success(data.message);
+          redirect();
+        } catch (error) {
+          console.log(error);
+        }
+      },
       signIn: async (email, password, redirect) => {
         try {
           const response = await fetch("http://localhost:3000/auth/signin", {

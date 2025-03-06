@@ -20,6 +20,8 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useUserStore } from "@/_zustand/stores/userStore";
+import { useRouter } from "next/navigation";
 
 const passwordSchema = z.string().min(6, {
   message: "Password must be at least 6 characters.",
@@ -59,6 +61,9 @@ const formSchema = z
   });
 
 const Signup = () => {
+  const signup = useUserStore((state) => state.signUp);
+  const router = useRouter();
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -71,8 +76,11 @@ const Signup = () => {
     },
   });
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
-    console.log(values);
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    const { email, firstName, lastName, age, password } = values;
+    await signup(email, password, firstName, lastName, age, () =>
+      router.push("/auth/signin")
+    );
   };
   return (
     <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
