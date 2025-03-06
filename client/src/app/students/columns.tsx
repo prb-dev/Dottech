@@ -48,7 +48,8 @@ import { z } from "zod";
 export type Student = {
   _id: string;
   email: string;
-  name: string;
+  firstName: string;
+  lastName: string;
   age: number;
   image: string;
   createdAt: string;
@@ -57,8 +58,11 @@ export type Student = {
 };
 
 const formSchema = z.object({
-  name: z.string().min(3, {
-    message: "Name must be at least 3 characters long.",
+  firstName: z.string().min(3, {
+    message: "First name must be at least 3 characters long.",
+  }),
+  lastName: z.string().min(3, {
+    message: "Last name must be at least 3 characters long.",
   }),
   age: z
     .number()
@@ -102,12 +106,18 @@ export const getColumns = (
       header: () => <div>Id</div>,
       cell: ({ row }) => <div>{row.getValue("_id")}</div>,
     },
-
     {
-      accessorKey: "name",
-      header: () => <div>Name</div>,
+      accessorKey: "firstName",
+      header: () => <div>First Name</div>,
       cell: ({ row }) => (
-        <div className="capitalize">{row.getValue("name")}</div>
+        <div className="capitalize">{row.getValue("firstName")}</div>
+      ),
+    },
+    {
+      accessorKey: "lastName",
+      header: () => <div>Last Name</div>,
+      cell: ({ row }) => (
+        <div className="capitalize">{row.getValue("lastName")}</div>
       ),
     },
     {
@@ -150,7 +160,8 @@ export const getColumns = (
         const form = useForm<z.infer<typeof formSchema>>({
           resolver: zodResolver(formSchema),
           defaultValues: {
-            name: row.original.name,
+            firstName: row.original.firstName,
+            lastName: row.original.lastName,
             age: row.original.age,
           },
         });
@@ -189,13 +200,8 @@ export const getColumns = (
 
           const data = await response.json();
 
-          if (response.status === 400) {
-            console.log(data);
-
-            data.details.forEach((error: any) => {
-              toast.error(error.message);
-            });
-
+          if (response.status !== 200) {
+            toast.error("Coudn't update student");
             return;
           }
 
@@ -267,12 +273,29 @@ export const getColumns = (
                 >
                   <FormField
                     control={form.control}
-                    name="name"
+                    name="firstName"
                     render={({ field }) => (
                       <FormItem className="w-full">
                         <FormControl>
                           <Input
-                            placeholder={student.name}
+                            placeholder={student.firstName}
+                            {...field}
+                            value={field.value ?? ""}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="lastName"
+                    render={({ field }) => (
+                      <FormItem className="w-full">
+                        <FormControl>
+                          <Input
+                            placeholder={student.lastName}
                             {...field}
                             value={field.value ?? ""}
                           />
@@ -307,7 +330,9 @@ export const getColumns = (
                     )}
                   />
 
-                  <Button type="submit">Done</Button>
+                  <div className="flex justify-end">
+                    <Button type="submit">Done</Button>
+                  </div>
                 </form>
               </Form>
             </DialogContent>

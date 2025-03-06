@@ -24,11 +24,17 @@ const formSchema = z.object({
     .refine((val) => !val || z.string().email().safeParse(val).success, {
       message: "Email must be valid.",
     }),
-  name: z
+  firstName: z
     .string()
     .optional()
     .refine((val) => !val || val.length >= 3, {
-      message: "Name must be at least 3 characters.",
+      message: "First name must be at least 3 characters.",
+    }),
+  lastName: z
+    .string()
+    .optional()
+    .refine((val) => !val || val.length >= 3, {
+      message: "Last name must be at least 3 characters.",
     }),
   age: z
     .number()
@@ -42,14 +48,16 @@ const formSchema = z.object({
 const Profile = () => {
   const updateUser = useUserStore((state) => state.updateUser);
   const email = useUserStore((state) => state.email);
-  const name = useUserStore((state) => state.name);
+  const firstName = useUserStore((state) => state.firstName);
+  const lastName = useUserStore((state) => state.lastName);
   const age = useUserStore((state) => state.age);
   const image = useUserStore((state) => state.image);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       email: undefined,
-      name: undefined,
+      firstName: undefined,
+      lastName: undefined,
       age: undefined,
     },
   });
@@ -64,9 +72,9 @@ const Profile = () => {
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      const { email, name, age } = values;
+      const { email, firstName, lastName, age } = values;
 
-      if (!email && !name && !age) return;
+      if (!email && !firstName && !lastName && !age) return;
 
       await updateUser(useUserStore.getState().id ?? "", values);
 
@@ -123,13 +131,13 @@ const Profile = () => {
 
             <FormField
               control={form.control}
-              name="name"
+              name="firstName"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Name</FormLabel>
+                  <FormLabel>First name</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder={name || ""}
+                      placeholder={firstName || ""}
                       {...field}
                       value={field.value ?? ""}
                     />
@@ -141,6 +149,28 @@ const Profile = () => {
                 </FormItem>
               )}
             />
+
+            <FormField
+              control={form.control}
+              name="lastName"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Last name</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder={lastName || ""}
+                      {...field}
+                      value={field.value ?? ""}
+                    />
+                  </FormControl>
+                  <FormDescription>
+                    This is your public display name.
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
             <FormField
               control={form.control}
               name="age"
