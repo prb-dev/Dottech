@@ -1,3 +1,4 @@
+import { Marks } from "../models/mark.model.js";
 import { User } from "../models/user.model.js";
 import { customError } from "../utils/error.util.js";
 import { logger } from "../utils/logger.util.js";
@@ -103,6 +104,8 @@ export const deleteStudent = async (req, res, next) => {
       logger.error(`Student with id ${id} not found: `, error);
       return next(error);
     }
+
+    await Marks.deleteOne({ student: id });
 
     logger.info(`Student with id ${id} deleted successfully.`);
     res.status(200).json({ message: "Student deleted successfully" });
