@@ -18,6 +18,7 @@ type userStore = {
     firstName: string,
     lastName: string,
     age: number,
+    role: string,
     redirect: () => void
   ) => Promise<void>;
   signIn: (
@@ -49,7 +50,15 @@ export const useUserStore = create<userStore>()(
       age: null,
       role: null,
       image: null,
-      signUp: async (email, password, firstName, lastName, age, redirect) => {
+      signUp: async (
+        email,
+        password,
+        firstName,
+        lastName,
+        age,
+        role,
+        redirect
+      ) => {
         try {
           const response = await fetch("http://localhost:3000/auth/signup", {
             method: "POST",
@@ -63,6 +72,7 @@ export const useUserStore = create<userStore>()(
               firstName,
               lastName,
               age,
+              role,
             }),
           });
 

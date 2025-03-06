@@ -22,6 +22,13 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useUserStore } from "@/_zustand/stores/userStore";
 import { useRouter } from "next/navigation";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const passwordSchema = z.string().min(6, {
   message: "Password must be at least 6 characters.",
@@ -49,6 +56,7 @@ const formSchema = z
       }),
     password: passwordSchema,
     confirmPassword: passwordSchema,
+    role: z.enum(["student", "teacher"]),
   })
   .superRefine(({ password, confirmPassword }, ctx) => {
     if (password !== confirmPassword) {
@@ -72,13 +80,14 @@ const Signup = () => {
       lastName: undefined,
       age: undefined,
       password: undefined,
+      role: "student",
       confirmPassword: undefined,
     },
   });
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    const { email, firstName, lastName, age, password } = values;
-    await signup(email, password, firstName, lastName, age, () =>
+    const { email, firstName, lastName, age, password, role } = values;
+    await signup(email, password, firstName, lastName, age, role, () =>
       router.push("/auth/signin")
     );
   };
@@ -117,43 +126,45 @@ const Signup = () => {
                       )}
                     />
 
-                    <FormField
-                      control={form.control}
-                      name="firstName"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>First Name</FormLabel>
-                          <FormControl>
-                            <Input
-                              placeholder="John"
-                              {...field}
-                              value={field.value ?? ""}
-                              required
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                    <div className="flex justify-between gap-5">
+                      <FormField
+                        control={form.control}
+                        name="firstName"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>First Name</FormLabel>
+                            <FormControl>
+                              <Input
+                                placeholder="John"
+                                {...field}
+                                value={field.value ?? ""}
+                                required
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
 
-                    <FormField
-                      control={form.control}
-                      name="lastName"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Last Name</FormLabel>
-                          <FormControl>
-                            <Input
-                              placeholder="Doe"
-                              {...field}
-                              value={field.value ?? ""}
-                              required
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                      <FormField
+                        control={form.control}
+                        name="lastName"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Last Name</FormLabel>
+                            <FormControl>
+                              <Input
+                                placeholder="Doe"
+                                {...field}
+                                value={field.value ?? ""}
+                                required
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
 
                     <FormField
                       control={form.control}
@@ -218,6 +229,33 @@ const Signup = () => {
                         </FormItem>
                       )}
                     />
+
+                    <FormField
+                      control={form.control}
+                      name="role"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-col">
+                          <FormLabel>Role</FormLabel>
+                          <FormControl>
+                            <Select
+                              {...field}
+                              value={field.value ?? ""}
+                              onValueChange={(value) => field.onChange(value)}
+                            >
+                              <SelectTrigger>
+                                <SelectValue placeholder="Role" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="student">Student</SelectItem>
+                                <SelectItem value="teacher">Teacher</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
                     <Button type="submit" className="w-full">
                       Signup
                     </Button>
