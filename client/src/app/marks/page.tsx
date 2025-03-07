@@ -4,8 +4,11 @@ import { Subject, columns } from "./columns";
 import { DataTable } from "./data-table";
 import { useUserStore } from "@/_zustand/stores/userStore";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 const Marks = () => {
+  const router = useRouter();
+  const signout = useUserStore((state) => state.signOut);
   const id = useUserStore((state) => state.id);
   const [subjects, setSubjects] = React.useState<Subject[]>([]);
 
@@ -25,6 +28,9 @@ const Marks = () => {
         const data = await response.json();
 
         if (response.status !== 200) {
+          if (response.status === 401) {
+            signout(() => router.push("/auth/signin"));
+          }
           toast.error("Couldn't retrieve marks");
           return;
         }

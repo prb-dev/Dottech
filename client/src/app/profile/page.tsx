@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import { useUserStore } from "@/_zustand/stores/userStore";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { CldUploadWidget, CloudinaryUploadWidgetInfo } from "next-cloudinary";
+import React from "react";
 
 const formSchema = z.object({
   email: z
@@ -45,7 +46,11 @@ const formSchema = z.object({
     }),
 });
 
+const signedInCheck = async () => {};
+
 const Profile = () => {
+  const signedIn = useUserStore((state) => state.signedIn);
+  const signout = useUserStore((state) => state.signOut);
   const updateUser = useUserStore((state) => state.updateUser);
   const email = useUserStore((state) => state.email);
   const firstName = useUserStore((state) => state.firstName);
