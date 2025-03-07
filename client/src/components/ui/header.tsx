@@ -17,8 +17,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useUserStore } from "@/_zustand/stores/userStore";
+import { useRouter } from "next/navigation";
 
 const Header = () => {
+  const router = useRouter();
+  const signout = useUserStore((state) => state.signOut);
   const role = useUserStore((state) => state.role);
   const signedIn = useUserStore((state) => state.signedIn);
   const image = useUserStore((state) => state.image);
@@ -58,7 +61,11 @@ const Header = () => {
                 <Link href="/profile" legacyBehavior passHref>
                   <DropdownMenuItem>Profile</DropdownMenuItem>
                 </Link>
-                <DropdownMenuItem>Signout</DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => signout(() => router.push("/auth/signin"))}
+                >
+                  Signout
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </NavigationMenuItem>

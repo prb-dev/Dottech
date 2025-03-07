@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { toast } from "sonner";
-import { setCookie } from "cookies-next/client";
+import { deleteCookie, setCookie } from "cookies-next/client";
 
 type userStore = {
   signedIn: boolean | null;
@@ -26,7 +26,7 @@ type userStore = {
     password: string,
     redirect: () => void
   ) => Promise<void>;
-  signOut: () => void;
+  signOut: (redirect: () => void) => Promise<void>;
   updateUser: (
     id: string,
     values: {
@@ -136,7 +136,34 @@ export const useUserStore = create<userStore>()(
           console.log(error);
         }
       },
-      signOut: () => {},
+      signOut: async (redirect) => {
+        try {
+          await fetch(`http://localhost:3000/auth/signout`, {
+            method: "GET",
+            headers: {
+              "Content-type": "application/json",
+            },
+            credentials: "include",
+          });
+
+          deleteCookie("signedIn");
+
+          set({
+            signedIn: false,
+            id: null,
+            email: null,
+            firstName: null,
+            lastName: null,
+            age: null,
+            role: null,
+            image: null,
+          });
+
+          redirect();
+        } catch (error) {
+          console.log(error);
+        }
+      },
       updateUser: async (id, values) => {
         try {
           const response = await fetch(`http://localhost:3000/users/${id}`, {
