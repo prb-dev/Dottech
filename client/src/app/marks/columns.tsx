@@ -54,7 +54,7 @@ const formSchema = z.object({
 });
 
 export const getColumns = (
-  getData: (id: string) => Promise<void>
+  getData: (id: string) => void
 ): ColumnDef<Subject>[] => {
   return [
     {

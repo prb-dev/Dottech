@@ -12,35 +12,35 @@ const Marks = () => {
   const id = useUserStore((state) => state.id);
   const [subjects, setSubjects] = React.useState<Subject[]>([]);
 
-  const getData = async (id: string | null) => {
-    try {
-      const response = await fetch(`http://localhost:3000/users/${id}/marks`, {
-        method: "GET",
-        credentials: "include",
-      });
-
-      const data = await response.json();
-
-      if (response.status !== 200) {
-        if (response.status === 401) {
-          signout(() => router.push("/auth/signin"));
+  const getData = (id: string | null) => {
+    fetch(`http://localhost:3000/users/${id}/marks`, {
+      method: "GET",
+      credentials: "include",
+    })
+      .then((response) => {
+        if (response.status !== 200) {
+          if (response.status === 401) {
+            signout(() => router.push("/auth/signin"));
+          }
+          toast.error("Couldn't retrieve marks");
+          return;
         }
-        toast.error("Couldn't retrieve marks");
-        return;
-      }
+        return response.json();
+      })
+      .then((data) => {
+        const subjects: Subject[] = data.marks.subjects.map(
+          (subject: { _id: string; name: string; marks: number }) => ({
+            id: subject._id,
+            name: subject.name,
+            mark: subject.marks,
+          })
+        );
 
-      const subjects: Subject[] = data.marks.subjects.map(
-        (subject: { _id: string; name: string; marks: number }) => ({
-          id: subject._id,
-          name: subject.name,
-          mark: subject.marks,
-        })
-      );
-
-      setSubjects(subjects);
-    } catch (error) {
-      console.log(error);
-    }
+        setSubjects(subjects);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
   React.useEffect(() => {
